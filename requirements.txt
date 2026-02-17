@@ -1,0 +1,6 @@
+flask
+berserk
+python-chess
+stockfish
+numpy
+torch
