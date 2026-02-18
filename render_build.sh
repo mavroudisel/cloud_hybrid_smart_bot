@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
-# exit on error
+# Exit on error
 set -o errexit
 
-echo "🚀 Starting Virtual Environment Build..."
+echo "🚀 Starting Master Build..."
 
 # 1. Δημιουργία Virtual Environment (Το "Κουτί")
 python3 -m venv venv
@@ -12,7 +12,7 @@ source venv/bin/activate
 pip install --upgrade pip
 pip install -r requirements.txt
 
-# 3. Καθαρισμός παλιών αρχείων Stockfish
+# 3. Καθαρισμός προηγούμενων αρχείων Stockfish
 rm -rf stockfish stockfish.tar temp_sf
 
 # 4. Κατέβασμα Stockfish
@@ -28,4 +28,4 @@ chmod +x stockfish
 # 6. Καθαρισμός
 rm -rf stockfish.tar temp_sf
 
-echo "✅ Build Complete inside VENV!"
+echo "✅ Build Complete! Everything is inside 'venv'."
