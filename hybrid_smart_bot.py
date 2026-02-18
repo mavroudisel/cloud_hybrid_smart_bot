@@ -17,14 +17,14 @@ MODEL_ONNX = "my_chess_bot.onnx"
 VOCAB_FILE = "vocab.npz"
 STOCKFISH_PATH = "./stockfish"
 
-# Χαμηλώνουμε το όριο για να διορθώνει πιο συχνά (ήταν 70)
-BLUNDER_THRESHOLD = 30  
+# Όρια Αξιολόγησης (σε εκατοστά του πιονιού - centipawns)
+EVAL_TOLERANCE = 50    # Μέχρι 0.5 πιόνι διαφορά = "Καλό"
+BLUNDER_LIMIT = 200    # Πάνω από 2 πιόνια διαφορά = "Blunder"
 
 app = Flask(__name__)
 log = logging.getLogger('werkzeug')
 log.setLevel(logging.ERROR)
 
-# Σύστημα Μηνυμάτων
 last_message = {"id": 0, "text": ""}
 message_id = 0
 
@@ -35,7 +35,7 @@ def broadcast_speech(text):
     print(f"🗣️ AUDIO SENT: {text}")
 
 # ==========================================
-#          HTML ΓΙΑ ΤΟ ΚΙΝΗΤΟ (FIXED)
+#          HTML INTERFACE (MOBILE)
 # ==========================================
 @app.route('/')
 def index():
@@ -43,42 +43,48 @@ def index():
     <!DOCTYPE html>
     <html>
     <head>
-        <title>Chess Coach</title>
+        <title>Live Chess Coach</title>
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <style>
-            body { background-color: #1a1a1a; color: white; font-family: sans-serif; text-align: center; padding: 50px; }
-            button { background-color: #4CAF50; color: white; padding: 20px 40px; font-size: 20px; border: none; border-radius: 10px; cursor: pointer; }
-            #status { margin-top: 20px; color: #aaa; }
+            body { background-color: #1a1a1a; color: #ddd; font-family: 'Arial', sans-serif; text-align: center; padding: 20px; }
+            h1 { color: #4CAF50; }
+            button { background-color: #ff9800; color: white; padding: 25px 50px; font-size: 22px; border: none; border-radius: 12px; cursor: pointer; margin-bottom: 30px; box-shadow: 0 4px 6px rgba(0,0,0,0.3); }
+            button:active { transform: translateY(2px); }
+            #last-msg { font-size: 26px; font-weight: bold; color: #fff; margin-top: 20px; padding: 20px; border: 2px solid #555; border-radius: 10px; background: #333; min-height: 50px;}
+            .info { font-size: 14px; color: #888; margin-top: 50px; }
         </style>
     </head>
     <body>
-        <h1>♟️ AI Coach Active</h1>
-        <p>1. Πάτα το κουμπί παρακάτω.</p>
-        <p>2. ΜΗΝ κλείσεις αυτή τη σελίδα (άσε την ανοιχτή).</p>
+        <h1>♟️ Προπονητής Live</h1>
+        <p>Θα σχολιάζω κάθε σου κίνηση.</p>
         <button onclick="startAudio()">🔊 ΕΝΕΡΓΟΠΟΙΗΣΗ ΗΧΟΥ</button>
-        <div id="status">Αναμονή για εντολές...</div>
+        <div id="last-msg">Αναμονή...</div>
+        <div class="info">Κράτα αυτή τη σελίδα ανοιχτή στο κινητό.</div>
 
         <script>
             let lastId = 0;
             function startAudio() {
-                // Dummy speak to unlock browser audio
-                let utterance = new SpeechSynthesisUtterance("Audio System Online");
-                window.speechSynthesis.speak(utterance);
-                document.getElementById('status').innerText = "✅ Ο Ήχος Ενεργοποιήθηκε!";
-                
-                // Start polling
+                let u = new SpeechSynthesisUtterance("Σύστημα ανάλυσης έτοιμο.");
+                u.lang = 'el-GR';
+                window.speechSynthesis.speak(u);
+                document.getElementById('last-msg').innerText = "✅ Συνδέθηκε";
+                document.getElementById('last-msg').style.borderColor = "#4CAF50";
                 setInterval(checkMessages, 1000);
             }
 
             function checkMessages() {
                 fetch('/poll')
-                .then(response => response.json())
+                .then(r => r.json())
                 .then(data => {
                     if (data.id > lastId) {
                         lastId = data.id;
-                        document.getElementById('status').innerText = "💬 " + data.text;
+                        document.getElementById('last-msg').innerText = data.text;
+                        
+                        // Speak
+                        window.speechSynthesis.cancel(); // Stop previous
                         let msg = new SpeechSynthesisUtterance(data.text);
-                        msg.lang = 'el-GR'; // Ελληνική φωνή
+                        msg.lang = 'el-GR';
+                        msg.rate = 1.1; 
                         window.speechSynthesis.speak(msg);
                     }
                 });
@@ -96,116 +102,127 @@ def run_server():
     app.run(host='0.0.0.0', port=port)
 
 # ==========================================
-#          ΥΒΡΙΔΙΚΟΣ ΕΓΚΕΦΑΛΟΣ
+#          Η ΝΟΗΜΟΣΥΝΗ (ΔΥΟ ΜΕΡΗ)
 # ==========================================
-class HybridBrain:
+class ChessBrain:
     def __init__(self):
-        # Stockfish Setup
-        try:
-            self.sf = Stockfish(path=STOCKFISH_PATH, depth=12, parameters={"Hash": 16, "Threads": 1})
-            print("✅ Stockfish Loaded!")
-        except Exception as e:
-            print(f"❌ Stockfish Failed: {e}")
-
-        # ONNX Setup
+        # Stockfish (Δυνατός για ανάλυση)
+        self.sf = Stockfish(path=STOCKFISH_PATH, depth=15, parameters={"Hash": 64})
+        
+        # ONNX Model (Το στυλ σου για να παίζει το bot)
         print("🧠 Loading ONNX Model...")
         try:
             data = np.load(VOCAB_FILE, allow_pickle=True)
             self.vocab = data['vocab'].item()
             self.idx_to_move = {v: k for k, v in self.vocab.items()}
             self.ort_session = ort.InferenceSession(MODEL_ONNX)
-            print("✅ ONNX Model Loaded Successfully!")
-        except Exception as e:
-            print(f"❌ ONNX Failed: {e}")
+            print("✅ ONNX Loaded!")
+        except:
             self.ort_session = None
 
-    def encode_board(self, board):
-        # Κωδικοποίηση 12x8x8
-        X = np.zeros((1, 12, 8, 8), dtype=np.float32)
-        piece_map = {
-            'P': 0, 'N': 1, 'B': 2, 'R': 3, 'Q': 4, 'K': 5,
-            'p': 6, 'n': 7, 'b': 8, 'r': 9, 'q': 10, 'k': 11
-        }
-        for square, piece in board.piece_map().items():
-            rank, file = divmod(square, 8)
-            # ΠΡΟΣΟΧΗ: Εδώ συνήθως γίνονται τα λάθη προσανατολισμού
-            X[0, piece_map[piece.symbol()], 7 - rank, file] = 1
-        return X
+    def analyze_user_move(self, board, move_uci):
+        """
+        Αναλύει την κίνηση που ΜΟΛΙΣ έκανε ο χρήστης.
+        Συγκρίνει την κίνηση χρήστη με την τέλεια κίνηση του Stockfish.
+        """
+        try:
+            # 1. Πηγαίνουμε το Board ΜΙΑ κίνηση πίσω (πριν παίξει ο χρήστης)
+            # για να δούμε τι επιλογές είχε.
+            board.pop() 
+            self.sf.set_fen_position(board.fen())
+            
+            # 2. Βρες την τέλεια κίνηση
+            best_move = self.sf.get_best_move()
+            
+            # 3. Αξιολόγησε την κίνηση του χρήστη
+            self.sf.make_moves_from_current_position([move_uci])
+            user_eval = self._get_eval_val()
+            
+            # 4. Αξιολόγησε την τέλεια κίνηση
+            self.sf.set_fen_position(board.fen()) # Reset
+            self.sf.make_moves_from_current_position([best_move])
+            best_eval = self._get_eval_val()
+            
+            # 5. Επαναφορά Board στην τρέχουσα κατάσταση (για να συνεχίσει το παιχνίδι)
+            board.push(chess.Move.from_uci(move_uci))
 
-    def get_move(self, board):
+            # 6. Υπολογισμός διαφοράς
+            # Η διαφορά είναι πάντα θετική (πόσο χειρότερη είναι η κίνηση του user από την best)
+            diff = abs(best_eval - user_eval)
+
+            # 7. ΣΧΟΛΙΑΣΜΟΣ
+            if move_uci == best_move or diff < 20:
+                broadcast_speech("Άριστη κίνηση!")
+            elif diff < EVAL_TOLERANCE:
+                broadcast_speech("Πολύ καλή κίνηση.")
+            elif diff < BLUNDER_LIMIT:
+                broadcast_speech("Μέτρια κίνηση. Υπήρχε και καλύτερη.")
+            else:
+                broadcast_speech(f"Πρόσεξε! Αυτό ήταν λάθος. Καλύτερη ήταν η {best_move}.")
+                
+        except Exception as e:
+            print(f"Analysis Error: {e}")
+            # Αν χαλάσει η ανάλυση, δεν λέμε τίποτα για να μην μπερδέψουμε
+            pass
+
+    def get_bot_move(self, board):
+        """
+        Βρίσκει τι θα παίξει το BOT (μίμηση εσένα + blunder check)
+        """
         my_move_uci = None
         
-        # --- 1. ΤΙ ΛΕΕΙ ΤΟ ΜΟΝΤΕΛΟ ΣΟΥ; ---
+        # Α. Μίμηση (ONNX)
         if self.ort_session:
             try:
-                input_feed = {self.ort_session.get_inputs()[0].name: self.encode_board(board)}
-                output = self.ort_session.run(None, input_feed)[0]
-                
-                # Πάρε τις top 3 κινήσεις για debugging
-                top_indices = np.argsort(output[0])[::-1][:3]
-                print(f"📊 Model Top 3 predictions indices: {top_indices}")
-                
+                X = self._encode_board(board)
+                input_name = self.ort_session.get_inputs()[0].name
+                output = self.ort_session.run(None, {input_name: X})[0]
+                top_indices = np.argsort(output[0])[::-1][:5]
                 for idx in top_indices:
-                    move_str = self.idx_to_move.get(idx)
-                    if move_str:
-                        move_obj = chess.Move.from_uci(move_str)
-                        if move_obj in board.legal_moves:
-                            print(f"🎯 Model picked legal move: {move_str}")
-                            my_move_uci = move_str
-                            break
-                        else:
-                            print(f"⚠️ Model picked ILLEGAL move: {move_str}")
-            except Exception as e:
-                print(f"⚠️ ONNX Error: {e}")
-
-        # Fallback αν το μοντέλο απέτυχε πλήρως
-        if not my_move_uci:
-            print("⚠️ Model failed to give legal move. Using Stockfish as base.")
+                    m = self.idx_to_move.get(idx)
+                    if m and chess.Move.from_uci(m) in board.legal_moves:
+                        my_move_uci = m
+                        break
+            except: pass
+        
+        if not my_move_uci: 
             my_move_uci = self.sf.get_best_move()
 
-        # --- 2. ΤΙ ΛΕΕΙ Ο STOCKFISH (ΔΙΟΡΘΩΤΗΣ); ---
-        try:
-            self.sf.set_fen_position(board.fen())
-            best_uci = self.sf.get_best_move()
-            
-            # Αξιολόγηση της κίνησης του Μοντέλου
-            self.sf.make_moves_from_current_position([my_move_uci])
-            my_eval = self.get_eval_score()
-            
-            # Επαναφορά και αξιολόγηση της τέλειας κίνησης
-            self.sf.set_fen_position(board.fen())
-            self.sf.make_moves_from_current_position([best_uci])
-            best_eval = self.get_eval_score()
-            self.sf.set_fen_position(board.fen()) # Reset
-
-            # Υπολογισμός διαφοράς (πάντα θετική)
-            # Centipawns: 100 = 1 πιόνι
-            diff = abs(best_eval - my_eval)
-            
-            print(f"⚖️ Move Check: Mine({my_move_uci})={my_eval} vs Best({best_uci})={best_eval}. Diff={diff}")
-
-            if diff > BLUNDER_THRESHOLD:
-                print(f"🚨 BLUNDER DETECTED! Correcting {my_move_uci} -> {best_uci}")
-                broadcast_speech("Διόρθωσα λάθος σου.")
-                return best_uci
-            
-        except Exception as e:
-            print(f"⚠️ Stockfish logic error: {e}")
-            return best_uci # Fallback σε Stockfish αν χαλάσει ο κώδικας
-
+        # Β. Έλεγχος Blunder Bot (να μην παίζει χάλια το bot)
+        self.sf.set_fen_position(board.fen())
+        best_uci = self.sf.get_best_move()
+        
+        if my_move_uci == best_uci: return my_move_uci
+        
+        # Check diff
+        self.sf.make_moves_from_current_position([my_move_uci])
+        eval_mine = self._get_eval_val()
+        self.sf.set_fen_position(board.fen())
+        self.sf.make_moves_from_current_position([best_uci])
+        eval_best = self._get_eval_val()
+        
+        # Το bot επιτρέπεται να παίζει λίγο χειρότερα (για να έχει το στυλ σου)
+        # αλλά όχι τραγικά (250 cp limit).
+        if abs(eval_best - eval_mine) > 250:
+            return best_uci
         return my_move_uci
 
-    def get_eval_score(self):
-        # Επιστρέφει σκορ πάντα από την πλευρά του Λευκού για σύγκριση
-        # ή απλά την απόλυτη τιμή της θέσης.
+    def _get_eval_val(self):
         ev = self.sf.get_evaluation()
         val = ev['value']
-        if ev['type'] == 'mate':
-            val = 10000 if val > 0 else -10000
+        if ev['type'] == 'mate': val = 10000 if val > 0 else -10000
         return val
 
+    def _encode_board(self, board):
+        X = np.zeros((1, 12, 8, 8), dtype=np.float32)
+        piece_map = {'P':0,'N':1,'B':2,'R':3,'Q':4,'K':5,'p':6,'n':7,'b':8,'r':9,'q':10,'k':11}
+        for sq, pc in board.piece_map().items():
+            r, f = divmod(sq, 8)
+            X[0, piece_map[pc.symbol()], 7 - r, f] = 1
+        return X
+
 # ==========================================
-#          ΚΥΡΙΟ ΠΡΟΓΡΑΜΜΑ
+#          MAIN LOOP
 # ==========================================
 if __name__ == "__main__":
     t = threading.Thread(target=run_server)
@@ -214,12 +231,11 @@ if __name__ == "__main__":
 
     session = berserk.TokenSession(TOKEN)
     client = berserk.Client(session)
-    brain = HybridBrain()
-    
-    me_id = "unknown"
+    brain = ChessBrain()
+
     try:
         me_id = client.account.get()['username'].lower()
-        print(f"🚀 Bot Connected: {me_id}")
+        print(f"🚀 Coach Ready: {me_id}")
     except: pass
 
     for event in client.bots.stream_incoming_events():
@@ -228,29 +244,40 @@ if __name__ == "__main__":
         
         elif event['type'] == 'gameStart':
             game_id = event['game']['gameId']
-            print(f"🎮 New Game: {game_id}")
-            
             stream = client.bots.stream_game_state(game_id)
             board = chess.Board()
-            is_white = True
+            is_white_bot = True # Υποθέτουμε αρχικά ότι το bot είναι White
             
             for g_evt in stream:
                 if g_evt['type'] == 'gameFull':
-                    is_white = (g_evt['white'].get('id', '').lower() == me_id)
-                    # Set initial state if needed
+                    # Ποιος είναι το Bot;
+                    is_white_bot = (g_evt['white'].get('id', '').lower() == me_id)
+                    
+                    # Φόρτωσε κινήσεις που έγιναν ήδη
                     moves = g_evt['state']['moves'].split()
                     for m in moves: 
                         if m: board.push(chess.Move.from_uci(m))
                 
                 elif g_evt['type'] == 'gameState':
                     moves = g_evt['moves'].split()
+                    # Ξαναφτιάχνουμε το board για σιγουριά
                     board = chess.Board()
                     for m in moves: 
                         if m: board.push(chess.Move.from_uci(m))
+                    
+                    # --- ΕΔΩ ΕΙΝΑΙ Η ΑΛΛΑΓΗ ---
+                    # Μόλις ήρθε νέο state. Ποιος έπαιξε τελευταίος;
+                    # Αν τώρα είναι σειρά του Bot, σημαίνει ότι ΜΟΛΙΣ ΕΠΑΙΞΕ Ο ΧΡΗΣΤΗΣ.
+                    if board.turn == (chess.WHITE if is_white_bot else chess.BLACK):
+                        if len(moves) > 0:
+                            last_move = moves[-1] # Η κίνηση που μόλις έκανες εσύ
+                            print(f"👀 User played: {last_move}. Analyzing...")
+                            brain.analyze_user_move(board, last_move)
 
+                # Αν το παιχνίδι δεν τελείωσε και είναι σειρά του Bot
                 if not board.is_game_over():
-                    # Είναι η σειρά μου;
-                    if board.turn == (chess.WHITE if is_white else chess.BLACK):
-                        move = brain.get_move(board)
-                        if move: 
-                            client.bots.make_move(game_id, move)
+                    if board.turn == (chess.WHITE if is_white_bot else chess.BLACK):
+                        # Το Bot σκέφτεται την απάντησή του
+                        bot_move = brain.get_bot_move(board)
+                        if bot_move: 
+                            client.bots.make_move(game_id, bot_move)
