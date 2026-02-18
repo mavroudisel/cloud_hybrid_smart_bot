@@ -1,0 +1,409 @@
+
+pytorch2.10.0:éÅ
+±	
+input
+conv1.weight
+
+conv1.biasgetitemnode_Conv_30"Conv*
+group†*
+pads@@@@†*
+strides@@†*
+auto_pad"NOTSET†*
+	dilations@@†J•
+	namespaceó: __main__.ChessNet/bn1: torch.nn.modules.batchnorm.BatchNorm2d/_native_batch_norm_legit_no_training: aten._native_batch_norm_legit_no_training.defaultJ:
+!pkg.onnxscript.rewriter.rule_nameFuseBatchNormIntoConvJñ
+pkg.torch.onnx.class_hierarchyt['__main__.ChessNet', 'torch.nn.modules.batchnorm.BatchNorm2d', 'aten._native_batch_norm_legit_no_training.default']Jî
+pkg.torch.onnx.fx_node˘%_native_batch_norm_legit_no_training : [num_users=1] = call_function[target=torch.ops.aten._native_batch_norm_legit_no_training.default](args = (%conv2d, %p_bn1_weight, %p_bn1_bias, %b_bn1_running_mean, %b_bn1_running_var, 0.1, 1e-05), kwargs = {})JQ
+pkg.torch.onnx.name_scopes3['', 'bn1', '_native_batch_norm_legit_no_training']J´
+pkg.torch.onnx.stack_traceåFile "/Users/melefth/Documents/my_chess_clone/cloud/convert.py", line 24, in forward
+    x = self.relu(self.bn1(self.conv1(x)))
+  File "/Users/melefth/miniforge3/lib/python3.13/site-packages/torch/nn/modules/batchnorm.py", line 194, in forward
+    return F.batch_norm(
+Û
+getitemrelu	node_relu"ReluJ_
+	namespaceR: __main__.ChessNet/relu: torch.nn.modules.activation.ReLU/relu: aten.relu.defaultJp
+pkg.torch.onnx.class_hierarchyN['__main__.ChessNet', 'torch.nn.modules.activation.ReLU', 'aten.relu.default']JÑ
+pkg.torch.onnx.fx_nodej%relu : [num_users=1] = call_function[target=torch.ops.aten.relu.default](args = (%getitem,), kwargs = {})J2
+pkg.torch.onnx.name_scopes['', 'relu', 'relu']J¬
+pkg.torch.onnx.stack_trace£File "/Users/melefth/Documents/my_chess_clone/cloud/convert.py", line 24, in forward
+    x = self.relu(self.bn1(self.conv1(x)))
+  File "/Users/melefth/miniforge3/lib/python3.13/site-packages/torch/nn/modules/activation.py", line 143, in forward
+    return F.relu(input, inplace=self.inplace)
+∫	
+relu
+conv2.weight
+
+conv2.bias	getitem_3node_Conv_31"Conv*
+group†*
+pads@@@@†*
+strides@@†*
+auto_pad"NOTSET†*
+	dilations@@†Jß
+	namespaceô: __main__.ChessNet/bn2: torch.nn.modules.batchnorm.BatchNorm2d/_native_batch_norm_legit_no_training_1: aten._native_batch_norm_legit_no_training.defaultJ:
+!pkg.onnxscript.rewriter.rule_nameFuseBatchNormIntoConvJñ
+pkg.torch.onnx.class_hierarchyt['__main__.ChessNet', 'torch.nn.modules.batchnorm.BatchNorm2d', 'aten._native_batch_norm_legit_no_training.default']Jò
+pkg.torch.onnx.fx_node˝%_native_batch_norm_legit_no_training_1 : [num_users=1] = call_function[target=torch.ops.aten._native_batch_norm_legit_no_training.default](args = (%conv2d_1, %p_bn2_weight, %p_bn2_bias, %b_bn2_running_mean, %b_bn2_running_var, 0.1, 1e-05), kwargs = {})JS
+pkg.torch.onnx.name_scopes5['', 'bn2', '_native_batch_norm_legit_no_training_1']J´
+pkg.torch.onnx.stack_traceåFile "/Users/melefth/Documents/my_chess_clone/cloud/convert.py", line 25, in forward
+    x = self.relu(self.bn2(self.conv2(x)))
+  File "/Users/melefth/miniforge3/lib/python3.13/site-packages/torch/nn/modules/batchnorm.py", line 194, in forward
+    return F.batch_norm(
+Å
+	getitem_3relu_1node_relu_1"ReluJa
+	namespaceT: __main__.ChessNet/relu: torch.nn.modules.activation.ReLU/relu_1: aten.relu.defaultJp
+pkg.torch.onnx.class_hierarchyN['__main__.ChessNet', 'torch.nn.modules.activation.ReLU', 'aten.relu.default']Jà
+pkg.torch.onnx.fx_noden%relu_1 : [num_users=1] = call_function[target=torch.ops.aten.relu.default](args = (%getitem_3,), kwargs = {})J4
+pkg.torch.onnx.name_scopes['', 'relu', 'relu_1']J¬
+pkg.torch.onnx.stack_trace£File "/Users/melefth/Documents/my_chess_clone/cloud/convert.py", line 25, in forward
+    x = self.relu(self.bn2(self.conv2(x)))
+  File "/Users/melefth/miniforge3/lib/python3.13/site-packages/torch/nn/modules/activation.py", line 143, in forward
+    return F.relu(input, inplace=self.inplace)
+º	
+relu_1
+conv3.weight
+
+conv3.bias	getitem_6node_Conv_32"Conv*
+group†*
+pads@@@@†*
+strides@@†*
+auto_pad"NOTSET†*
+	dilations@@†Jß
+	namespaceô: __main__.ChessNet/bn3: torch.nn.modules.batchnorm.BatchNorm2d/_native_batch_norm_legit_no_training_2: aten._native_batch_norm_legit_no_training.defaultJ:
+!pkg.onnxscript.rewriter.rule_nameFuseBatchNormIntoConvJñ
+pkg.torch.onnx.class_hierarchyt['__main__.ChessNet', 'torch.nn.modules.batchnorm.BatchNorm2d', 'aten._native_batch_norm_legit_no_training.default']Jò
+pkg.torch.onnx.fx_node˝%_native_batch_norm_legit_no_training_2 : [num_users=1] = call_function[target=torch.ops.aten._native_batch_norm_legit_no_training.default](args = (%conv2d_2, %p_bn3_weight, %p_bn3_bias, %b_bn3_running_mean, %b_bn3_running_var, 0.1, 1e-05), kwargs = {})JS
+pkg.torch.onnx.name_scopes5['', 'bn3', '_native_batch_norm_legit_no_training_2']J´
+pkg.torch.onnx.stack_traceåFile "/Users/melefth/Documents/my_chess_clone/cloud/convert.py", line 26, in forward
+    x = self.relu(self.bn3(self.conv3(x)))
+  File "/Users/melefth/miniforge3/lib/python3.13/site-packages/torch/nn/modules/batchnorm.py", line 194, in forward
+    return F.batch_norm(
+Å
+	getitem_6relu_2node_relu_2"ReluJa
+	namespaceT: __main__.ChessNet/relu: torch.nn.modules.activation.ReLU/relu_2: aten.relu.defaultJp
+pkg.torch.onnx.class_hierarchyN['__main__.ChessNet', 'torch.nn.modules.activation.ReLU', 'aten.relu.default']Jà
+pkg.torch.onnx.fx_noden%relu_2 : [num_users=1] = call_function[target=torch.ops.aten.relu.default](args = (%getitem_6,), kwargs = {})J4
+pkg.torch.onnx.name_scopes['', 'relu', 'relu_2']J¬
+pkg.torch.onnx.stack_trace£File "/Users/melefth/Documents/my_chess_clone/cloud/convert.py", line 26, in forward
+    x = self.relu(self.bn3(self.conv3(x)))
+  File "/Users/melefth/miniforge3/lib/python3.13/site-packages/torch/nn/modules/activation.py", line 143, in forward
+    return F.relu(input, inplace=self.inplace)
+º	
+relu_2
+conv4.weight
+
+conv4.bias	getitem_9node_Conv_33"Conv*
+group†*
+pads@@@@†*
+strides@@†*
+auto_pad"NOTSET†*
+	dilations@@†Jß
+	namespaceô: __main__.ChessNet/bn4: torch.nn.modules.batchnorm.BatchNorm2d/_native_batch_norm_legit_no_training_3: aten._native_batch_norm_legit_no_training.defaultJ:
+!pkg.onnxscript.rewriter.rule_nameFuseBatchNormIntoConvJñ
+pkg.torch.onnx.class_hierarchyt['__main__.ChessNet', 'torch.nn.modules.batchnorm.BatchNorm2d', 'aten._native_batch_norm_legit_no_training.default']Jò
+pkg.torch.onnx.fx_node˝%_native_batch_norm_legit_no_training_3 : [num_users=1] = call_function[target=torch.ops.aten._native_batch_norm_legit_no_training.default](args = (%conv2d_3, %p_bn4_weight, %p_bn4_bias, %b_bn4_running_mean, %b_bn4_running_var, 0.1, 1e-05), kwargs = {})JS
+pkg.torch.onnx.name_scopes5['', 'bn4', '_native_batch_norm_legit_no_training_3']J´
+pkg.torch.onnx.stack_traceåFile "/Users/melefth/Documents/my_chess_clone/cloud/convert.py", line 27, in forward
+    x = self.relu(self.bn4(self.conv4(x)))
+  File "/Users/melefth/miniforge3/lib/python3.13/site-packages/torch/nn/modules/batchnorm.py", line 194, in forward
+    return F.batch_norm(
+Å
+	getitem_9relu_3node_relu_3"ReluJa
+	namespaceT: __main__.ChessNet/relu: torch.nn.modules.activation.ReLU/relu_3: aten.relu.defaultJp
+pkg.torch.onnx.class_hierarchyN['__main__.ChessNet', 'torch.nn.modules.activation.ReLU', 'aten.relu.default']Jà
+pkg.torch.onnx.fx_noden%relu_3 : [num_users=1] = call_function[target=torch.ops.aten.relu.default](args = (%getitem_9,), kwargs = {})J4
+pkg.torch.onnx.name_scopes['', 'relu', 'relu_3']J¬
+pkg.torch.onnx.stack_trace£File "/Users/melefth/Documents/my_chess_clone/cloud/convert.py", line 27, in forward
+    x = self.relu(self.bn4(self.conv4(x)))
+  File "/Users/melefth/miniforge3/lib/python3.13/site-packages/torch/nn/modules/activation.py", line 143, in forward
+    return F.relu(input, inplace=self.inplace)
+è
+relu_3
+val_29view	node_view"Reshape*
+	allowzero†Jb
+	namespaceU: __main__.ChessNet/flatten: torch.nn.modules.flatten.Flatten/view: aten.view.defaultJp
+pkg.torch.onnx.class_hierarchyN['__main__.ChessNet', 'torch.nn.modules.flatten.Flatten', 'aten.view.default']Jç
+pkg.torch.onnx.fx_nodes%view : [num_users=1] = call_function[target=torch.ops.aten.view.default](args = (%relu_3, [1, 4096]), kwargs = {})J5
+pkg.torch.onnx.name_scopes['', 'flatten', 'view']J≥
+pkg.torch.onnx.stack_traceîFile "/Users/melefth/Documents/my_chess_clone/cloud/convert.py", line 28, in forward
+    x = self.flatten(x)
+  File "/Users/melefth/miniforge3/lib/python3.13/site-packages/torch/nn/modules/flatten.py", line 55, in forward
+    return input.flatten(self.start_dim, self.end_dim)
+‹
+view
+
+fc1.weight
+fc1.biaslinearnode_linear"Gemm*
+beta  Ä?†*
+transB†*
+alpha  Ä?†*
+transA †J`
+	namespaceS: __main__.ChessNet/fc1: torch.nn.modules.linear.Linear/linear: aten.linear.defaultJp
+pkg.torch.onnx.class_hierarchyN['__main__.ChessNet', 'torch.nn.modules.linear.Linear', 'aten.linear.default']J°
+pkg.torch.onnx.fx_nodeÜ%linear : [num_users=1] = call_function[target=torch.ops.aten.linear.default](args = (%view, %p_fc1_weight, %p_fc1_bias), kwargs = {})J3
+pkg.torch.onnx.name_scopes['', 'fc1', 'linear']J∂
+pkg.torch.onnx.stack_traceóFile "/Users/melefth/Documents/my_chess_clone/cloud/convert.py", line 29, in forward
+    x = self.relu(self.fc1(x))
+  File "/Users/melefth/miniforge3/lib/python3.13/site-packages/torch/nn/modules/linear.py", line 134, in forward
+    return F.linear(input, self.weight, self.bias)
+Ô
+linearrelu_4node_relu_4"ReluJa
+	namespaceT: __main__.ChessNet/relu: torch.nn.modules.activation.ReLU/relu_4: aten.relu.defaultJp
+pkg.torch.onnx.class_hierarchyN['__main__.ChessNet', 'torch.nn.modules.activation.ReLU', 'aten.relu.default']JÖ
+pkg.torch.onnx.fx_nodek%relu_4 : [num_users=1] = call_function[target=torch.ops.aten.relu.default](args = (%linear,), kwargs = {})J4
+pkg.torch.onnx.name_scopes['', 'relu', 'relu_4']J∂
+pkg.torch.onnx.stack_traceóFile "/Users/melefth/Documents/my_chess_clone/cloud/convert.py", line 29, in forward
+    x = self.relu(self.fc1(x))
+  File "/Users/melefth/miniforge3/lib/python3.13/site-packages/torch/nn/modules/activation.py", line 143, in forward
+    return F.relu(input, inplace=self.inplace)
+›
+relu_4
+
+fc2.weight
+fc2.biasoutputnode_linear_1"Gemm*
+beta  Ä?†*
+transB†*
+alpha  Ä?†*
+transA †Jb
+	namespaceU: __main__.ChessNet/fc2: torch.nn.modules.linear.Linear/linear_1: aten.linear.defaultJp
+pkg.torch.onnx.class_hierarchyN['__main__.ChessNet', 'torch.nn.modules.linear.Linear', 'aten.linear.default']J•
+pkg.torch.onnx.fx_nodeä%linear_1 : [num_users=1] = call_function[target=torch.ops.aten.linear.default](args = (%relu_4, %p_fc2_weight, %p_fc2_bias), kwargs = {})J5
+pkg.torch.onnx.name_scopes['', 'fc2', 'linear_1']J´
+pkg.torch.onnx.stack_traceåFile "/Users/melefth/Documents/my_chess_clone/cloud/convert.py", line 30, in forward
+    x = self.fc2(x)
+  File "/Users/melefth/miniforge3/lib/python3.13/site-packages/torch/nn/modules/linear.py", line 134, in forward
+    return F.linear(input, self.weight, self.bias)
+main_graph*_@Bconv1.weightj"
+locationmy_chess_bot.onnx.dataj
+offset9972j
+length27648p*ì@B
+conv1.biasJÄnq8>÷øg>b#QøÑfΩ<w=*ß øú>æLï«>eﬂËΩ`
+ò>›—∂æ`%Ä<.üB>^¯≤>9jm>@H<¥'øÑÓ/=£b~>Á∑™æîÅã>ñSì>î:éøpÓ¶><EΩΩıø>Då£>‰ã>M0Ñ>Ë•Ñ={‹_>Pó‹º<S:Ω √£>»K™=E@ø›ø⁄3s>†u?"ê>Ã&iø £'>Ëw√ΩøgÆ>h:∑=¶Qª>¬=Ue_ø¿=ä;[)>QÎì>∞WÈΩ‡”Ωöﬁ`=,n’>.‘n>páæº∏‰ø
+ê ΩËf	øõæúºæõ}éæ˜uƒΩ*bÄ@Bconv2.weightj"
+locationmy_chess_bot.onnx.dataj
+offset37620j
+length294912p*SÄB
+conv2.biasj"
+locationmy_chess_bot.onnx.dataj
+offset0j
+length512p*dÄÄBconv3.weightj"
+locationmy_chess_bot.onnx.dataj
+offset627444j
+length589824p*UÄB
+conv3.biasj"
+locationmy_chess_bot.onnx.dataj
+offset512j
+length512p*c@ÄBconv4.weightj"
+locationmy_chess_bot.onnx.dataj
+offset332532j
+length294912p*ì@B
+conv4.biasJÄRn%øT>Ä>ãT„æ0m.æåyæ∂ë>6@	?ê/=$_KæáìÈæ¢}£æ0}˝=0µ=`rùΩ∑>P“	ΩËÖæhÿN>@>º\ó]>\RæÈæºæH◊§æ(¸Ω(µ>@î”=†	>HFÒΩ–€ΩÁ øVMâæ~f≥>ãÌø∂ æÿã∑æ‰j>¿g[=∞[ºΩy÷æâ-¸æÑ^∂æÊä>@g-º:DÖæ‡Â =x9ãæå∑ÂæŒç>B‚Çæêó‰æ(ºΩ :ΩÖiæPõ:ΩÄ ºOÿªæ‡NO=ì]Ùæ¯x>®[Ê=œ˙æEé,øÚ@Åæ¿Zc=*`ÄÄ B
+fc1.weightj"
+locationmy_chess_bot.onnx.dataj
+offset4784128j
+length8388608p*UÄBfc1.biasj"
+locationmy_chess_bot.onnx.dataj
+offset1024j
+length2048p*`ΩÄB
+fc2.weightj"
+locationmy_chess_bot.onnx.dataj
+offset1245184j
+length3532800p*UΩBfc2.biasj"
+locationmy_chess_bot.onnx.dataj
+offset3072j
+length6900p*Bval_29J              Z≈
+input
+
+
+
+
+"=
+/pkg.torch.export.graph_signature.InputSpec.kind
+USER_INPUT"=
+5pkg.torch.export.graph_signature.InputSpec.persistentNone"&
+!pkg.torch.onnx.original_node_namexbâ
+output
+	
+
+Ω"?
+0pkg.torch.export.graph_signature.OutputSpec.kindUSER_OUTPUT"-
+!pkg.torch.onnx.original_node_namelinear_1j&
+conv1.weight
+
+@
+
+
+j
+
+conv1.bias
+
+
+@j'
+conv2.weight
+
+Ä
+@
+
+j
+
+conv2.bias
+	
+Äj(
+conv3.weight
+
+Ä
+Ä
+
+j
+
+conv3.bias
+	
+Äj'
+conv4.weight
+
+@
+Ä
+
+j
+
+conv4.bias
+
+
+@jŒ
+
+fc1.weight
+
+
+Ä
+Ä "<
+/pkg.torch.export.graph_signature.InputSpec.kind	PARAMETER"=
+5pkg.torch.export.graph_signature.InputSpec.persistentNone"1
+!pkg.torch.onnx.original_node_namep_fc1_weightj≈
+fc1.bias
+	
+Ä"<
+/pkg.torch.export.graph_signature.InputSpec.kind	PARAMETER"=
+5pkg.torch.export.graph_signature.InputSpec.persistentNone"/
+!pkg.torch.onnx.original_node_name
+p_fc1_biasjŒ
+
+fc2.weight
+
+
+Ω
+Ä"<
+/pkg.torch.export.graph_signature.InputSpec.kind	PARAMETER"=
+5pkg.torch.export.graph_signature.InputSpec.persistentNone"1
+!pkg.torch.onnx.original_node_namep_fc2_weightj≈
+fc2.bias
+	
+Ω"<
+/pkg.torch.export.graph_signature.InputSpec.kind	PARAMETER"=
+5pkg.torch.export.graph_signature.InputSpec.persistentNone"/
+!pkg.torch.onnx.original_node_name
+p_fc2_biasjR
+val_29
+
+
+"<
+$pkg.onnxscript.optimizer.folded_from['val_27', 'val_28']j!
+getitem
+
+
+@
+
+j
+relu
+
+
+@
+
+j$
+	getitem_3
+
+
+Ä
+
+j!
+relu_1
+
+
+Ä
+
+j$
+	getitem_6
+
+
+Ä
+
+j!
+relu_2
+
+
+Ä
+
+j#
+	getitem_9
+
+
+@
+
+j 
+relu_3
+
+
+@
+
+j
+view
+	
+
+Ä j
+linear
+	
+
+Äj
+relu_4
+	
+
+ÄÇ¬
+0pkg.torch.export.ExportedProgram.graph_signatureç
+# inputs
+p_conv1_weight: PARAMETER target='conv1.weight'
+p_conv1_bias: PARAMETER target='conv1.bias'
+p_bn1_weight: PARAMETER target='bn1.weight'
+p_bn1_bias: PARAMETER target='bn1.bias'
+p_conv2_weight: PARAMETER target='conv2.weight'
+p_conv2_bias: PARAMETER target='conv2.bias'
+p_bn2_weight: PARAMETER target='bn2.weight'
+p_bn2_bias: PARAMETER target='bn2.bias'
+p_conv3_weight: PARAMETER target='conv3.weight'
+p_conv3_bias: PARAMETER target='conv3.bias'
+p_bn3_weight: PARAMETER target='bn3.weight'
+p_bn3_bias: PARAMETER target='bn3.bias'
+p_conv4_weight: PARAMETER target='conv4.weight'
+p_conv4_bias: PARAMETER target='conv4.bias'
+p_bn4_weight: PARAMETER target='bn4.weight'
+p_bn4_bias: PARAMETER target='bn4.bias'
+p_fc1_weight: PARAMETER target='fc1.weight'
+p_fc1_bias: PARAMETER target='fc1.bias'
+p_fc2_weight: PARAMETER target='fc2.weight'
+p_fc2_bias: PARAMETER target='fc2.bias'
+b_bn1_running_mean: BUFFER target='bn1.running_mean' persistent=True
+b_bn1_running_var: BUFFER target='bn1.running_var' persistent=True
+b_bn1_num_batches_tracked: BUFFER target='bn1.num_batches_tracked' persistent=True
+b_bn2_running_mean: BUFFER target='bn2.running_mean' persistent=True
+b_bn2_running_var: BUFFER target='bn2.running_var' persistent=True
+b_bn2_num_batches_tracked: BUFFER target='bn2.num_batches_tracked' persistent=True
+b_bn3_running_mean: BUFFER target='bn3.running_mean' persistent=True
+b_bn3_running_var: BUFFER target='bn3.running_var' persistent=True
+b_bn3_num_batches_tracked: BUFFER target='bn3.num_batches_tracked' persistent=True
+b_bn4_running_mean: BUFFER target='bn4.running_mean' persistent=True
+b_bn4_running_var: BUFFER target='bn4.running_var' persistent=True
+b_bn4_num_batches_tracked: BUFFER target='bn4.num_batches_tracked' persistent=True
+x: USER_INPUT
+
+# outputs
+linear_1: USER_OUTPUT
+Ç8
+2pkg.torch.export.ExportedProgram.range_constraints{}B
+ 
