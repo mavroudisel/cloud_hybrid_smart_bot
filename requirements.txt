@@ -3,4 +3,4 @@ berserk
 python-chess
 stockfish
 numpy
-torch
+onnxruntime
